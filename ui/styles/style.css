@@ -1,0 +1,371 @@
+/* =============================================
+   INFERNO HUD — style.css
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@600;700&display=swap');
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; user-select:none; }
+
+body {
+    background: transparent;
+    overflow: hidden;
+    width: 100vw; height: 100vh;
+}
+
+/* =============================================
+   HUD ROOT — bottom center, near vehicle
+   ============================================= */
+#hud {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+
+    transition: opacity 0.35s ease;
+    cursor: grab;
+}
+
+#hud:active { cursor: grabbing; }
+
+#hud.hidden { opacity: 0; pointer-events: none; }
+
+/* Fire canvas fills hud background */
+#fire-canvas {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    border-radius: 14px;
+    opacity: 0.55;
+}
+
+/* =============================================
+   CONTROLS
+   ============================================= */
+#hud-controls {
+    position: fixed;
+    bottom: 18px;
+    left: calc(50% + 230px);
+    display: flex;
+    gap: 3px;
+    z-index: 100;
+}
+
+.ctrl-btn {
+    background: rgba(255,40,0,0.15);
+    border: 1px solid rgba(255,80,0,0.3);
+    border-radius: 4px;
+    color: rgba(255,150,80,0.8);
+    font-size: 12px;
+    width: 22px; height: 18px;
+    cursor: pointer;
+    font-family: 'Orbitron', monospace;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.ctrl-btn:hover { background: rgba(255,70,0,0.3); color: #ffdd00; }
+
+/* =============================================
+   LEFT / RIGHT CLUSTERS
+   ============================================= */
+.cluster {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: relative;
+    z-index: 2;
+    width: 130px;
+}
+
+.left-cluster  { align-items: flex-end; }
+.right-cluster { align-items: flex-start; }
+
+/* Indicator pill */
+.indicator-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(8,2,0,0.82);
+    border: 1px solid rgba(255,60,0,0.28);
+    border-radius: 20px;
+    padding: 4px 9px 4px 7px;
+    width: 100%;
+    min-height: 28px;
+    box-shadow: 0 0 8px rgba(255,40,0,0.15), inset 0 0 6px rgba(255,30,0,0.04);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.indicator-pill.active {
+    border-color: rgba(255,120,0,0.6);
+    box-shadow: 0 0 12px rgba(255,80,0,0.4), inset 0 0 8px rgba(255,50,0,0.06);
+}
+
+.pill-icon {
+    width: 13px; height: 13px;
+    flex-shrink: 0;
+    fill: rgba(255,100,40,0.55);
+    transition: fill 0.2s;
+}
+
+.indicator-pill.active .pill-icon { fill: #ff8800; }
+
+.pill-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    flex: 1;
+    transition: color 0.2s;
+}
+
+.pill-text.on  { color: #ffcc00; text-shadow: 0 0 6px rgba(255,160,0,0.7); }
+.pill-text.off { color: rgba(255,80,40,0.4); }
+.pill-text.warn { color: #ff3300; text-shadow: 0 0 6px rgba(255,0,0,0.8); }
+
+.pill-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: rgba(255,40,0,0.2);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.pill-dot.on  { background: #ffcc00; box-shadow: 0 0 5px #ff8800; }
+.pill-dot.off { background: rgba(255,40,0,0.2); }
+.pill-dot.warn { background: #ff2200; box-shadow: 0 0 6px #ff0000; }
+
+/* Pill bars (fuel / health) */
+.pill-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pill-bar-track {
+    width: 100%;
+    height: 5px;
+    background: rgba(255,30,0,0.1);
+    border: 1px solid rgba(255,50,0,0.2);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.pill-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease, background 0.4s;
+    width: 100%;
+}
+
+.fuel-color   { background: linear-gradient(90deg,#ff2200,#ff6600,#ffdd00); box-shadow: 0 0 5px rgba(255,100,0,0.6); }
+.health-color { background: linear-gradient(90deg,#cc0000,#ff4400,#ff8800); box-shadow: 0 0 5px rgba(255,60,0,0.6); }
+
+.pill-bar.low {
+    background: linear-gradient(90deg,#660000,#990000) !important;
+    animation: lowPulse 0.5s ease infinite alternate;
+}
+
+@keyframes lowPulse {
+    from { box-shadow: 0 0 4px rgba(180,0,0,0.6); }
+    to   { box-shadow: 0 0 10px rgba(220,0,0,1.0); }
+}
+
+.pill-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 8px;
+    color: rgba(255,180,100,0.7);
+    text-align: right;
+}
+
+/* =============================================
+   CENTER SPEEDO
+   ============================================= */
+.center-speedo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Top indicators */
+.top-indicators {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(8,2,0,0.82);
+    border: 1px solid rgba(255,60,0,0.28);
+    border-radius: 20px;
+    padding: 4px 14px;
+    width: 100%;
+    justify-content: center;
+}
+
+.ind-arrow {
+    font-size: 13px;
+    color: rgba(255,100,0,0.2);
+    transition: color 0.15s, text-shadow 0.15s;
+}
+
+.ind-arrow.active {
+    color: #ff9900;
+    text-shadow: 0 0 8px #ff8800;
+    animation: arrowBlink 0.5s ease infinite alternate;
+}
+
+@keyframes arrowBlink {
+    from { opacity: 0.5; }
+    to   { opacity: 1.0; }
+}
+
+.ind-icon {
+    font-size: 12px;
+    opacity: 0.2;
+    transition: opacity 0.2s, filter 0.2s;
+}
+
+.ind-icon.active { opacity: 1; filter: drop-shadow(0 0 4px #ffcc00); }
+.ind-icon.warn.active { filter: drop-shadow(0 0 5px #ff2200); animation: warnBlink 0.4s ease infinite alternate; }
+
+@keyframes warnBlink {
+    from { opacity: 0.6; }
+    to   { opacity: 1.0; }
+}
+
+/* Dial wrap */
+.dial-wrap {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+#dial-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 200px; height: 200px;
+}
+
+.dial-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.speed-num-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+}
+
+.speed-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 56px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -3px;
+    text-shadow:
+        0 0 10px rgba(255,120,0,0.9),
+        0 0 26px rgba(255,60,0,0.6);
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+.speed-unit {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #ff6600;
+    text-shadow: 0 0 7px rgba(255,80,0,0.7);
+    margin-top: 2px;
+}
+
+/* Gear badge */
+.gear-badge {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 900;
+    color: #ffdd00;
+    text-shadow: 0 0 10px #ff6600, 0 0 22px #ff2200;
+    margin-top: 6px;
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+/* Speed colour states */
+.speed-num.s-slow { color:#fff; }
+.speed-num.s-med  { color:#ffd060; text-shadow:0 0 14px #ff8800, 0 0 28px #ff5500; }
+.speed-num.s-fast { color:#ff8800; text-shadow:0 0 14px #ff5500, 0 0 32px #ff2200; }
+.speed-num.s-max  { color:#ff3300; text-shadow:0 0 18px #ff2200, 0 0 42px #ff0000; animation:maxFlicker 0.22s ease infinite alternate; }
+
+@keyframes maxFlicker {
+    from { text-shadow:0 0 18px #ff2200, 0 0 42px #ff0000; }
+    to   { text-shadow:0 0 28px #ff4400, 0 0 60px #ff2200; }
+}
+
+/* Bottom row */
+.bottom-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(8,2,0,0.82);
+    border: 1px solid rgba(255,60,0,0.28);
+    border-radius: 20px;
+    padding: 5px 12px;
+    width: 100%;
+}
+
+.rpm-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: rgba(255,120,60,0.55);
+    flex-shrink: 0;
+}
+
+.rpm-track {
+    flex: 1;
+    height: 7px;
+    background: rgba(255,30,0,0.1);
+    border: 1px solid rgba(255,50,0,0.22);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.rpm-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 4px;
+    background: linear-gradient(90deg,#ff2200,#ff6600,#ffdd00);
+    box-shadow: 0 0 6px rgba(255,100,0,0.7);
+    transition: width 0.06s linear;
+}
+
+.rpm-redline {
+    position: absolute;
+    top: 0; right: 0;
+    width: 20%;
+    height: 100%;
+    background: rgba(255,0,0,0.15);
+    border-left: 1px solid rgba(255,0,0,0.4);
+}
+
+.odo-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 8px;
+    color: rgba(255,140,60,0.55);
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+}
